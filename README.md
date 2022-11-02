@@ -1,4 +1,4 @@
-![Logo](https://raw.githubusercontent.com/Reidy007/NeverBot/main/assets/banner.png)
+![Logo](assets/banner.png)
 # Я никогда не...
 
 **Discord Бот для игры в "я никогда не... 🤔".**
