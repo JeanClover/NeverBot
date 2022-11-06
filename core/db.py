@@ -1,5 +1,3 @@
-
-
 from os import getenv
 
 from motor.motor_asyncio import AsyncIOMotorClient

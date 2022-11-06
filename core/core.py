@@ -5,7 +5,7 @@ from jishaku.modules import find_extensions_in
 from jishaku import Flags as JFlags
 
 
-class INeverBot(Bot):
+class NeverBot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -18,12 +18,13 @@ class INeverBot(Bot):
         environ['JISHAKU_EMBEDDED_JSK'] = 'true'
 
         # load extensions
-        for folder in listdir('cogs'):
-            for cog in find_extensions_in(f'cogs/{folder}'):
-                    try:
-                        self.load_extension(cog)
-                    except Exception as cog_error:
-                        print(f'{cog}: {cog_error}')
+        for cog in find_extensions_in('cogs'):
+                try:
+                    self.load_extension('cogs.commands')
+                except Exception as cog_error:
+                    print(f'{cog}: {cog_error}')
+                else:
+                    print(f'{cog} loaded')
 
     async def on_ready(self):
         print(f'{self.user.name} is running')

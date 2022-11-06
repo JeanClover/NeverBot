@@ -1,0 +1,6 @@
+disnake==2.5.0
+disnake-jishaku
+pymongo[srv]
+motor
+dnspython
+python-dotenv
