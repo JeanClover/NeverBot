@@ -91,7 +91,7 @@ class Game(disnake.ui.View):
             await self.interaction.send('**Никто из участников не нажал на кнопки в течении 15 секунд, поэтому игра была принудительно остановлена.**')
             return self.stop()
         else:
-            controls_view = GameControls(self.interaction.author.id)
+            controls_view = GameControls(self.interaction.author.id, self)
             users_embed = Embed(title='Ответы пользователей', color=Color.green())
 
             users_embed.add_field(name='Правда', value='\n'.join(self.true_users) or '**Нет пользователей которые выбрали этот ответ.**', inline=False)
