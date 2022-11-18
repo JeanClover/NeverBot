@@ -85,7 +85,9 @@ class Game(disnake.ui.View):
         self.interaction = interaction
         self.true_users = []
         self.false_users = []
-        self.game_embed = Embed(title='Я никогда не...', description=question, color=Color.purple())
+        self.game_embed = Embed(title='Я никогда не...',
+                                description=f'{question}\n\n**[Предложить добавить свой вопрос](https://discord.gg/VbW78syZSa)**',
+                                color=Color.purple())
         self.game_embed.set_thumbnail(url='https://raw.githubusercontent.com/whoisreidy/NeverBot/main/assets/avatar_emoji.png')
 
     async def on_timeout(self) -> None:
