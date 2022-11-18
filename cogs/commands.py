@@ -2,7 +2,7 @@ from typing import Union
 
 import disnake.ui
 from disnake.ext import commands
-from disnake import Embed, Color, ApplicationCommandInteraction, MessageInteraction, ButtonStyle
+from disnake import Embed, Color, ApplicationCommandInteraction, MessageInteraction, ButtonStyle, File
 
 from core.db import random_question
 
@@ -67,7 +67,9 @@ class GameControls(disnake.ui.View):
             for button in self.children:
                 button.disabled = True
 
-            await interaction.message.edit('**Игра остановлена**', embed=interaction.message.embeds[0], view=self)
+            await interaction.message.edit(embed=interaction.message.embeds[0], view=self)
+            await interaction.send('**Игра остановлена**')
+
             self.game.stop()
             self.stop()
         else:
@@ -84,7 +86,8 @@ class Game(disnake.ui.View):
         self.true_users = []
         self.false_users = []
         self.game_embed = Embed(title='Я никогда не...', description=question, color=Color.purple())
-        self.game_embed.set_thumbnail(url='attachment://assets/avatar_emoji.png')
+        self.img_emoji = File("assets/avatar_emoji.png", filename="avatar_emoji.png")
+        self.game_embed.set_thumbnail(url='attachment://avatar_emoji.png')
 
     async def on_timeout(self) -> None:
         if len(self.true_users) == 0 and len(self.false_users) == 0:
@@ -102,7 +105,7 @@ class Game(disnake.ui.View):
     async def next_game(self):
         question = await random_question(self.mode)
         next_game = Game(self.bot, question['text'], self.interaction, self.mode)
-        await self.interaction.send(embed=next_game.game_embed, view=next_game)
+        await self.interaction.send(embed=next_game.game_embed, file=self.img_emoji view=next_game)
 
     # Game buttons
     @disnake.ui.button(label='Правда', style=ButtonStyle.success)
