@@ -57,7 +57,7 @@ class GameControls(disnake.ui.View):
         for button in self.children:
             button.disabled = True
 
-        await interaction.edit_original_message(view=self)
+        await interaction.edit_original_message(embed=interaction.message.embeds[0], view=self)
         await interaction.send(f'**{interaction.author.mention}** продолжил игру.')
         await self.game.next_game()
 
@@ -67,7 +67,7 @@ class GameControls(disnake.ui.View):
             for button in self.children:
                 button.disabled = True
 
-            await interaction.edit_original_message(embed=interaction.message.embeds[0], description='**Игра остановлена**')
+            await interaction.edit_original_message('**Игра остановлена**', embed=interaction.message.embeds[0])
             self.game.stop()
             self.stop()
         else:
