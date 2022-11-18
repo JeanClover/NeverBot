@@ -117,7 +117,7 @@ class Game(disnake.ui.View):
         else:
             await interaction.send('Вы не можете изменить свой вариант ответа.', ephemeral=True)
 
-    @disnake.ui.button(label='Ложь', style=ButtonStyle.success)
+    @disnake.ui.button(label='Ложь', style=ButtonStyle.danger)
     async def false_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
         if str(interaction.author) not in self.true_users and (interaction.author) not in self.false_users:
             self.false_users.append(str(interaction.author))
