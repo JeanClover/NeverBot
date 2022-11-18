@@ -46,21 +46,29 @@ class SelectModeButtons(disnake.ui.View):
 
 class GameControls(disnake.ui.View):
 
-    def __init__(self, game_author_id):
+    def __init__(self, game_author_id, game):
         super().__init__(timeout=120)
 
+        self.game = game
         self.game_author_id = game_author_id
 
     @disnake.ui.button(label='Продолжить игру', style=ButtonStyle.green)
     async def next_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
+        async for button in self.children:
+            button.disabled = True
+
         await interaction.send(f'**{interaction.author.mention}** продолжил игру.')
         await interaction.edit_original_message(embed=interaction.message.embeds[0])
-        await self.next_game()
+        await self.game.next_game()
 
     @disnake.ui.button(label='Стоп', style=ButtonStyle.danger)
     async def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
         if interaction.author.id == self.game_author_id:
+            async for button in self.children:
+                button.disabled = True
+
             await interaction.edit_original_message(embed=interaction.message.embeds[0], description='**Игра остановлена**')
+            self.game.stop()
             self.stop()
         else:
             await interaction.send(f'**Остановить игру может только пользователь который начал её: {self.interaction.author.mention}**', ephemeral=True)
