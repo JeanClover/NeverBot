@@ -54,7 +54,7 @@ class GameControls(disnake.ui.View):
 
     @disnake.ui.button(label='Продолжить игру', style=ButtonStyle.green)
     async def next_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
-        async for button in self.children:
+        for button in self.children:
             button.disabled = True
 
         await interaction.send(f'**{interaction.author.mention}** продолжил игру.')
@@ -62,7 +62,7 @@ class GameControls(disnake.ui.View):
         await self.game.next_game()
 
     @disnake.ui.button(label='Стоп', style=ButtonStyle.danger)
-    async def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
+    def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
         if interaction.author.id == self.game_author_id:
             async for button in self.children:
                 button.disabled = True
