@@ -46,11 +46,11 @@ class SelectModeButtons(disnake.ui.View):
 
 class Game(disnake.ui.View):
 
-    def __init__(self, bot: Union[commands.Bot, commands.AutoShardedBot], question: str, channel, nsfw: bool = False):
+    def __init__(self, bot: Union[commands.Bot, commands.AutoShardedBot], question: str, interaction, nsfw: bool = False):
         super().__init__(timeout=15.0)
         self.bot = bot
         self.mode = nsfw
-        self.interaction = channel
+        self.interaction = interaction
         self.true_users = []
         self.false_users = []
         self.game_embed = Embed(title='Я никогда не...', description=question, color=Color.purple())
@@ -58,7 +58,7 @@ class Game(disnake.ui.View):
 
     async def on_timeout(self) -> None:
         if len(self.true_users) == 0 and len(self.false_users) == 0:
-            await self.channel.send('**Никто из участников не нажал на кнопки в течении 15 секунд, поэтому игра была принудительно остановлена.**')
+            await self.interaction.send('**Никто из участников не нажал на кнопки в течении 15 секунд, поэтому игра была принудительно остановлена.**')
             return self.stop()
         else:
             next_view = disnake.ui.View(timeout=60.0)
@@ -71,8 +71,8 @@ class Game(disnake.ui.View):
             users_embed.add_field(name='Правда', value='\n'.join(self.true_users) or '**Нет пользователей которые выбрали этот ответ.**')
             users_embed.add_field(name='Ложь', value='\n'.join(self.false_users) or '**Нет пользователей которые выбрали этот ответ.**')
 
-            next_button_message = await self.channel.send(embed=users_embed, view=next_view)
-            responce = await self.bot.wait_for('button_click', check=lambda inter: inter.component.custom_id == 'next_button' and inter.channel_id == self.channel.id)
+            next_button_message = await self.interaction.send(embed=users_embed, view=next_view)
+            responce = await self.bot.wait_for('button_click', check=lambda inter: inter.component.custom_id == 'next_button' and inter.interaction_id == self.interaction.id)
 
             next_view.children[0].disabled = True
 
@@ -83,8 +83,8 @@ class Game(disnake.ui.View):
 
     async def next_game(self):
         question = await random_question(self.mode)
-        next_game = Game(self.bot, question['text'], self.channel, self.mode)
-        await self.channel.send(embed=next_game.game_embed, view=next_game)
+        next_game = Game(self.bot, question['text'], self.interaction, self.mode)
+        await self.interaction.send(embed=next_game.game_embed, view=next_game)
 
     # Game buttons
     @disnake.ui.button(label='Правда', style=ButtonStyle.success)
@@ -113,8 +113,8 @@ class GameCommands(commands.Cog):
         embed = Embed(title='Выберите категорию вопросов',
                         description='**Примечание:** Вы должны отвечать на вопросы в течении 15 секунд, в противном случае игра будет принудительно остановлена', 
                         color=Color.purple())
-        embed.add_field(name='Ссылки:', value='• По вопросам и предложениям сюда -> **(Сервер поддержки)[https://discord.gg/VbW78syZSa]** \
-                                                \n• Оцените бота на мониторингах, это поможет в продвижении -> **(Список мониторингов)[https://neverbot.ml/monitorings]**')
+        embed.add_field(name='Ссылки:', value='• По вопросам и предложениям сюда -> **[Сервер поддержки](https://discord.gg/VbW78syZSa)** \
+                                                \n• Оцените бота на мониторингах, это поможет в продвижении -> **[Список мониторингов](https://neverbot.ml/monitorings)**')
 
         mode_view = SelectModeButtons(interaction.author.id)
 
@@ -122,7 +122,7 @@ class GameCommands(commands.Cog):
         await mode_view.wait()
 
         question = await random_question(mode_view.mode)
-        game = Game(interaction.bot, question['text'], interaction.channel, mode_view.mode)
+        game = Game(interaction.bot, question['text'], interaction, mode_view.mode)
 
         await interaction.send(embed=game.game_embed, view=game)
         await interaction.edit_original_message(embed=embed, view=mode_view)
