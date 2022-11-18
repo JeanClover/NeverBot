@@ -58,7 +58,7 @@ class GameControls(disnake.ui.View):
             button.disabled = True
 
         await interaction.send(f'**{interaction.author.mention}** продолжил игру.')
-        await interaction.edit_original_message(embed=interaction.message.embeds[0])
+        await interaction.edit_original_message(view=self)
         await self.game.next_game()
 
     @disnake.ui.button(label='Стоп', style=ButtonStyle.danger)
