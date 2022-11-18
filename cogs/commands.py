@@ -62,9 +62,9 @@ class GameControls(disnake.ui.View):
         await self.game.next_game()
 
     @disnake.ui.button(label='Стоп', style=ButtonStyle.danger)
-    def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
+    async def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
         if interaction.author.id == self.game_author_id:
-            async for button in self.children:
+            for button in self.children:
                 button.disabled = True
 
             await interaction.edit_original_message(embed=interaction.message.embeds[0], description='**Игра остановлена**')
