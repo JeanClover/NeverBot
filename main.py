@@ -8,6 +8,7 @@ from core import NeverBot
 
 intents = Intents.default()
 intents.guilds = True
+intents.message_content = True
 
 
 bot = NeverBot(

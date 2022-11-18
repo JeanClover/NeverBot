@@ -41,7 +41,29 @@ class SelectModeButtons(disnake.ui.View):
             self.mode = True
             self.stop()
         else:
-            await interaction.send('Категорию вопросов может выбрать только тот кто начал игру', ephemeral=True)
+            await interaction.send(f'**Категорию вопросов может выбрать только тот кто начал игру**', ephemeral=True)
+
+
+class GameControls(disnake.ui.View):
+
+    def __init__(self, game_author_id):
+        super().__init__(timeout=120)
+
+        self.game_author_id = game_author_id
+
+    @disnake.ui.button(label='Продолжить игру', style=ButtonStyle.green)
+    async def next_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
+        await interaction.send(f'**{interaction.author.mention}** продолжил игру.')
+        await interaction.edit_original_message(embed=interaction.message.embeds[0])
+        await self.next_game()
+
+    @disnake.ui.button(label='Стоп', style=ButtonStyle.danger)
+    async def stop_button(self, button: disnake.ui.Button, interaction: MessageInteraction):
+        if interaction.author.id == self.game_author_id:
+            await interaction.edit_original_message(embed=interaction.message.embeds[0], description='**Игра остановлена**')
+            self.stop()
+        else:
+            await interaction.send(f'**Остановить игру может только пользователь который начал её: {self.interaction.author.mention}**', ephemeral=True)
 
 
 class Game(disnake.ui.View):
@@ -61,25 +83,13 @@ class Game(disnake.ui.View):
             await self.interaction.send('**Никто из участников не нажал на кнопки в течении 15 секунд, поэтому игра была принудительно остановлена.**')
             return self.stop()
         else:
-            next_view = disnake.ui.View(timeout=60.0)
-            next_button = disnake.ui.Button(label='Продолжить игру', custom_id='next_button', style=ButtonStyle.green)
-            stop_button = disnake.ui.Button(label='Стоп', custom_id='stop_button', style=ButtonStyle.danger)
-            next_view.add_item(next_button)
-            next_view.add_item(stop_button)
-
+            controls_view = GameControls(self.interaction.author_id)
             users_embed = Embed(title='Ответы пользователей', color=Color.green())
-            users_embed.add_field(name='Правда', value='\n'.join(self.true_users) or '**Нет пользователей которые выбрали этот ответ.**')
-            users_embed.add_field(name='Ложь', value='\n'.join(self.false_users) or '**Нет пользователей которые выбрали этот ответ.**')
 
-            next_button_message = await self.interaction.send(embed=users_embed, view=next_view)
-            responce = await self.bot.wait_for('button_click', check=lambda inter: inter.component.custom_id == 'next_button' and inter.interaction_id == self.interaction.id)
+            users_embed.add_field(name='Правда', value='\n'.join(self.true_users) or '**Нет пользователей которые выбрали этот ответ.**', inline=False)
+            users_embed.add_field(name='Ложь', value='\n'.join(self.false_users) or '**Нет пользователей которые выбрали этот ответ.**', inline=False)
 
-            next_view.children[0].disabled = True
-
-            await responce.reply(f'**{responce.author}** продолжил игру.')
-            await next_button_message.edit(embed=users_embed, view=next_view)
-            await self.next_game()
-            return self.stop()
+            await self.interaction.send(embed=users_embed, view=controls_view)
 
     async def next_game(self):
         question = await random_question(self.mode)
