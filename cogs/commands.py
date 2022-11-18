@@ -105,7 +105,7 @@ class Game(disnake.ui.View):
     async def next_game(self):
         question = await random_question(self.mode)
         next_game = Game(self.bot, question['text'], self.interaction, self.mode)
-        await self.interaction.send(embed=next_game.game_embed, file=self.img_emoji view=next_game)
+        await self.interaction.send(embed=next_game.game_embed, file=self.img_emoji, view=next_game)
 
     # Game buttons
     @disnake.ui.button(label='Правда', style=ButtonStyle.success)
